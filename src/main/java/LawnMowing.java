@@ -14,11 +14,11 @@ public class LawnMowing {
     final int MAP_DIRECTION = 2;
 
     //Lawn dimensions
-    public Integer lawnSizeX;
-    public Integer lawnSizeY;
+    Integer lawnSizeX;
+    Integer lawnSizeY;
 
     //List of mowers on the lawn
-    public List<Mower> mowers = new ArrayList<>();
+    List<Mower> mowers = new ArrayList<>();
 
     private Mower halfBuiltMower;
 
