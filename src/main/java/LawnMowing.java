@@ -8,11 +8,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class LawnMowing {
-    //File mapping
-    final int MAP_X = 0;
-    final int MAP_Y = 1;
-    final int MAP_DIRECTION = 2;
-
     //Lawn dimensions
     Integer lawnSizeX;
     Integer lawnSizeY;
@@ -40,6 +35,37 @@ public class LawnMowing {
         return this;
     }
 
+    /**
+     * Starts all the mowers on the lawn mower list.
+     */
+    public void processMowersOrders() {
+        mowers.stream().forEachOrdered(m -> m.processAllOrders(this::checkIfPositionIsLegal));
+    }
+
+    /**
+     * function to check if a mower can be at coordinates
+     * @param finalPosX the potential x-coordinate of the mower
+     * @param finalPosY the potential y-coordinate of the mower
+     * @return 0 if the position is legal, a positive number otherwise
+     */
+    public Integer checkIfPositionIsLegal(Integer finalPosX, Integer finalPosY) {
+        //Check if the final pos is in the field
+        if ( finalPosX < 0 || finalPosX > lawnSizeX ||
+                finalPosY < 0 || finalPosY > lawnSizeY) {
+            return 1;
+        }
+        //Check if the mower collides with another mower
+        return mowers.stream()
+                .map(mower -> {
+                           if (mower.posX.equals(finalPosX) && mower.posY.equals(finalPosY)) {
+                               return 1;
+                           }
+                            return 0;
+                        })
+                .reduce((m1, m2) -> m1 + m2)
+                .get();
+    }
+
     //Processing of file lines
     private void consumeLine(String s) {
         //If no lawn size exists, we look for the lawn size
@@ -61,8 +87,8 @@ public class LawnMowing {
         String[] lawnDimensions;
         if (lawnSizeLine.matches("^\\d \\d$")){
             lawnDimensions = lawnSizeLine.split("\\s+");
-            lawnSizeX = Integer.valueOf(lawnDimensions[MAP_X]);
-            lawnSizeY = Integer.valueOf(lawnDimensions[MAP_Y]);
+            lawnSizeX = Integer.valueOf(lawnDimensions[Directions.MAP_X]);
+            lawnSizeY = Integer.valueOf(lawnDimensions[Directions.MAP_Y]);
         }
         else {
             System.out.println("Lawn size failure");
@@ -75,9 +101,9 @@ public class LawnMowing {
         if (mowerLocation.matches("^\\d \\d [NSEW]$")) {
             String[] coords = mowerLocation.split("\\s+");
             halfBuiltMower = new Mower().setPosition(
-                    Integer.valueOf(coords[MAP_X]),
-                    Integer.valueOf(coords[MAP_Y]),
-                    coords[MAP_DIRECTION]);
+                    Integer.valueOf(coords[Directions.MAP_X]),
+                    Integer.valueOf(coords[Directions.MAP_Y]),
+                    coords[Directions.MAP_DIRECTION]);
         }
         else {
             System.out.println("Mower location failure");
