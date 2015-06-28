@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 
 /**
@@ -44,16 +45,16 @@ public class Mower {
 
     /**
      * Processes the mower's order list
-     * @param checkIfMovementIsLegalMethod A method to check if a movement is legal.
+     * @param isMovementLegal A method to check if a movement is legal.
      */
-    public void processAllOrders(BinaryOperator<Integer> checkIfMovementIsLegalMethod) {
+    public void processAllOrders(BiFunction<Integer, Integer, Boolean> isMovementLegal) {
         orders.stream()
                 .map(this::ordersToMovements)
                 .filter(this::doesMove) //Filtering out the stationary movements.
                 .forEachOrdered(movement -> {
-                    if (checkIfMovementIsLegalMethod.apply(
+                    if (isMovementLegal.apply(
                             posX + movement.get(Directions.MAP_X),
-                            posY + movement.get(Directions.MAP_Y)) == 0) {
+                            posY + movement.get(Directions.MAP_Y))) {
                         setPosition(posX + movement.get(Directions.MAP_X),
                                     posY + movement.get(Directions.MAP_Y),
                                     direction);
@@ -86,12 +87,47 @@ public class Mower {
                 break;
             //If pivot, we pivot direction and return no move.
             case TURN_RIGHT:
-                direction = Directions.pivotRight(direction);
+                pivotRight();
                 break;
             case TURN_LEFT:
-                direction = Directions.pivotLeft(direction);
+                pivotLeft();
                 break;
         }
         return Directions.noMove;
+    }
+
+    //steering methods
+    private Direction pivotLeft(){
+        switch(direction){
+            case NORTH:
+                direction = Direction.WEST;
+                break;
+            case SOUTH:
+                direction = Direction.EAST;
+                break;
+            case EAST:
+                direction = Direction.NORTH;
+                break;
+            case WEST:
+                direction = Direction.SOUTH;
+        }
+        return null;
+    }
+
+    private Direction pivotRight() {
+        switch(direction){
+            case NORTH:
+                direction = Direction.WEST;
+                break;
+            case SOUTH:
+                direction = Direction.EAST;
+                break;
+            case EAST:
+                direction = Direction.SOUTH;
+                break;
+            case WEST:
+                direction = Direction.NORTH;
+        }
+        return null;
     }
 }

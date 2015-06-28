@@ -39,7 +39,7 @@ public class LawnMowing {
      * Starts all the mowers on the lawn mower list.
      */
     public void processMowersOrders() {
-        mowers.stream().forEachOrdered(m -> m.processAllOrders(this::checkIfPositionIsLegal));
+        mowers.stream().forEachOrdered(m -> m.processAllOrders(this::isPositionLegal));
     }
 
     /**
@@ -48,21 +48,16 @@ public class LawnMowing {
      * @param finalPosY the potential y-coordinate of the mower
      * @return 0 if the position is legal, a positive number otherwise
      */
-    public Integer checkIfPositionIsLegal(Integer finalPosX, Integer finalPosY) {
+    public boolean isPositionLegal(Integer finalPosX, Integer finalPosY) {
         //Check if the final pos is in the field
         if ( finalPosX < 0 || finalPosX > lawnSizeX ||
                 finalPosY < 0 || finalPosY > lawnSizeY) {
-            return 1;
+            return false;
         }
         //Check if the mower collides with another mower
         return mowers.stream()
-                .map(mower -> {
-                           if (mower.posX.equals(finalPosX) && mower.posY.equals(finalPosY)) {
-                               return 1;
-                           }
-                            return 0;
-                        })
-                .reduce((m1, m2) -> m1 + m2)
+                .map(mower -> !(mower.posX.equals(finalPosX) && mower.posY.equals(finalPosY)))
+                .reduce((m1, m2) -> m1 & m2)
                 .get();
     }
 
