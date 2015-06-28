@@ -41,10 +41,10 @@ public class LawnMowingTest {
 
         assertEquals(new Integer(1), lawnMowing.mowers.get(0).posX);
         assertEquals(new Integer(3), lawnMowing.mowers.get(0).posY);
-        assertEquals("N", lawnMowing.mowers.get(0).direction);
+        assertEquals(Direction.NORTH, lawnMowing.mowers.get(0).direction);
         assertEquals(new Integer(5), lawnMowing.mowers.get(1).posX);
         assertEquals(new Integer(1), lawnMowing.mowers.get(1).posY);
-        assertEquals("E", lawnMowing.mowers.get(1).direction);
+        assertEquals(Direction.EAST, lawnMowing.mowers.get(1).direction);
     }
 
     @Test

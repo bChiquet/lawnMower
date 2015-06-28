@@ -85,12 +85,13 @@ public class LawnMowing {
     //Processes lawn size file line
     private void setLawnSize(String lawnSizeLine) {
         String[] lawnDimensions;
-        if (lawnSizeLine.matches("^\\d \\d$")){
+        if (lawnSizeLine.matches("^(\\d) (\\d)$")){
             lawnDimensions = lawnSizeLine.split("\\s+");
             lawnSizeX = Integer.valueOf(lawnDimensions[Directions.MAP_X]);
             lawnSizeY = Integer.valueOf(lawnDimensions[Directions.MAP_Y]);
         }
         else {
+            //TODO use proper logger
             System.out.println("Lawn size failure");
             //throw lawnNotOkException
         }
@@ -103,7 +104,8 @@ public class LawnMowing {
             halfBuiltMower = new Mower().setPosition(
                     Integer.valueOf(coords[Directions.MAP_X]),
                     Integer.valueOf(coords[Directions.MAP_Y]),
-                    coords[Directions.MAP_DIRECTION]);
+                    Direction.fromString(coords[Directions.MAP_DIRECTION])
+            );
         }
         else {
             System.out.println("Mower location failure");

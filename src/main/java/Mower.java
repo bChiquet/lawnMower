@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BinaryOperator;
 
@@ -8,9 +9,9 @@ public class Mower {
     //Mower coordinates & direction faced
     Integer posX;
     Integer posY;
-    String direction;
+    Direction direction;
     //Orders to be executed by the mower
-    private String orders;
+    private List<Order> orders = new ArrayList<>();
 
     /**
      * Setting the mower's position
@@ -19,7 +20,7 @@ public class Mower {
      * @param direction the direction the mower is facing
      * @return self - harmcrest style.
      */
-    public Mower setPosition(Integer posX, Integer posY, String direction){
+    public Mower setPosition(Integer posX, Integer posY, Direction direction){
         this.posX = posX;
         this.posY = posY;
         this.direction = direction;
@@ -32,7 +33,12 @@ public class Mower {
      * @return self - harmcrest style.
      */
     public Mower setOrders(String orders) {
-        this.orders = orders;
+
+        orders.chars()
+                .mapToObj(c -> (char)c)
+                .map(Object::toString)
+                .map(Order::fromString)
+                .forEachOrdered(this.orders::add);
         return this;
     }
 
@@ -41,21 +47,16 @@ public class Mower {
      * @param checkIfMovementIsLegalMethod A method to check if a movement is legal.
      */
     public void processAllOrders(BinaryOperator<Integer> checkIfMovementIsLegalMethod) {
-        orders.chars()
-                .mapToObj(c -> (char) c)
-                .map(Object::toString)
+        orders.stream()
                 .map(this::ordersToMovements)
                 .filter(this::doesMove) //Filtering out the stationary movements.
                 .forEachOrdered(movement -> {
                     if (checkIfMovementIsLegalMethod.apply(
                             posX + movement.get(Directions.MAP_X),
-                            posY + movement.get(Directions.MAP_Y)) != 0) {
-                        //Do nothing because the mower would get illegal position
-                    }
-                    else {
+                            posY + movement.get(Directions.MAP_Y)) == 0) {
                         setPosition(posX + movement.get(Directions.MAP_X),
-                                posY + movement.get(Directions.MAP_Y),
-                                direction);
+                                    posY + movement.get(Directions.MAP_Y),
+                                    direction);
                     }
                 });
     }
@@ -68,26 +69,28 @@ public class Mower {
     }
 
     //Translates the movements from the order list into a list of coordinate changes.
-    private List<Integer> ordersToMovements(String order) {
+    private List<Integer> ordersToMovements(Order order) {
         //If the mower moves forward, return move vector.
-        if (order.equals("A")) {
-            switch (direction) {
-                case "N":
-                    return Directions.moveNorth;
-                case "S":
-                    return Directions.moveSouth;
-                case "E":
-                    return Directions.moveEast;
-                case "W":
-                    return Directions.moveWest;
-            }
-        }
-        //If pivot, we pivot direction and return no move.
-        else if(order.equals("D")){
-            direction = Directions.pivotRight(direction);
-        }
-        else if(order.equals("G")){
-            direction = Directions.pivotLeft(direction);
+        switch (order) {
+            case MOVE:
+                switch (direction) {
+                    case NORTH:
+                        return Directions.moveNorth;
+                    case SOUTH:
+                        return Directions.moveSouth;
+                    case EAST:
+                        return Directions.moveEast;
+                    case WEST:
+                        return Directions.moveWest;
+                }
+                break;
+            //If pivot, we pivot direction and return no move.
+            case TURN_RIGHT:
+                direction = Directions.pivotRight(direction);
+                break;
+            case TURN_LEFT:
+                direction = Directions.pivotLeft(direction);
+                break;
         }
         return Directions.noMove;
     }
