@@ -30,7 +30,7 @@ public class Mower {
      * @param orders the list of orders
      * @return self - harmcrest style.
      */
-    public Mower setOrders(String orders) {
+    public Mower setOrdersFromString(String orders) {
         orders.chars()
                 .mapToObj(c -> (char) c)
                 .map(Object::toString)

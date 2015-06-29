@@ -5,13 +5,15 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class LawnMowing {
     //File mapping
-    static int MAP_X = 0;
-    static int MAP_Y = 1;
-    static int MAP_DIRECTION = 2;
+    static int MAP_X = 1;
+    static int MAP_Y = 2;
+    static int MAP_DIRECTION = 3;
 
     //Lawn dimensions
     Integer lawnSizeX;
@@ -83,11 +85,11 @@ public class LawnMowing {
 
     //Processes lawn size file line
     private void setLawnSize(String lawnSizeLine) {
-        String[] lawnDimensions;
-        if (lawnSizeLine.matches("^(\\d) (\\d)$")){
-            lawnDimensions = lawnSizeLine.split("\\s+");
-            lawnSizeX = Integer.valueOf(lawnDimensions[MAP_X]);
-            lawnSizeY = Integer.valueOf(lawnDimensions[MAP_Y]);
+        Matcher lawnSize = Pattern.compile("^(\\d) (\\d)$")
+                .matcher(lawnSizeLine);
+        if (lawnSize.matches()){
+            lawnSizeX = Integer.parseInt(lawnSize.group(MAP_X));
+            lawnSizeY = Integer.parseInt(lawnSize.group(MAP_Y));
         }
         else {
             //TODO use proper logger
@@ -98,12 +100,13 @@ public class LawnMowing {
 
     //Processes mower initial location file line
     private void beginMowerAssembly(String mowerLocation) {
-        if (mowerLocation.matches("^\\d \\d [NSEW]$")) {
-            String[] coords = mowerLocation.split("\\s+");
+        Matcher location = Pattern.compile("^(\\d) (\\d) ([NSEW])$")
+                .matcher(mowerLocation);
+        if (location.matches()) {
             halfBuiltMower = new Mower().setPosition(
-                    Integer.valueOf(coords[MAP_X]),
-                    Integer.valueOf(coords[MAP_Y]),
-                    Direction.fromString(coords[MAP_DIRECTION])
+                    Integer.parseInt(location.group(MAP_X)),
+                    Integer.parseInt(location.group(MAP_Y)),
+                    Direction.fromString(location.group(MAP_DIRECTION))
             );
         }
         else {
@@ -115,7 +118,7 @@ public class LawnMowing {
     //Processes mower orders file line
     private void completeMowerAssembly(String mowerOrders) {
         if (mowerOrders.matches("^[ADG]+$")){
-            mowers.add(halfBuiltMower.setOrders(mowerOrders));
+            mowers.add(halfBuiltMower.setOrdersFromString(mowerOrders));
             halfBuiltMower = null;
         }
         else {
