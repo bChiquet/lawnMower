@@ -1,4 +1,6 @@
 import com.google.common.base.Throwables;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,7 +24,12 @@ public class LawnMowing {
     //List of mowers on the lawn
     List<Mower> mowers = new ArrayList<>();
 
+    //As mower instructions are on multiple lines, we build the mower incrementally.
+    //The mower being processed is stored here.
     private Mower halfBuiltMower;
+
+    //A logger
+    Logger logger = LoggerFactory.getLogger(LawnMowing.class);
 
     /**
      * reads mowing file and initializes LawnMowing
@@ -91,9 +98,8 @@ public class LawnMowing {
             lawnSizeY = Integer.parseInt(lawnSize.group(MAP_Y));
         }
         else {
-            //TODO use proper logger
-            System.out.println("Lawn size failure");
-            //throw lawnNotOkException
+            logger.error("Lawn size failure");
+            //throw lawnNotOkException ?
         }
     }
 
@@ -109,8 +115,8 @@ public class LawnMowing {
             );
         }
         else {
-            System.out.println("Mower location failure");
-            //Throw cantFindMowerException
+            logger.error("Mower location failure");
+            //Throw cantFindMowerException ?
         }
     }
 
@@ -126,8 +132,8 @@ public class LawnMowing {
             halfBuiltMower = null;
         }
         else {
-            System.out.println("Mower orders failure");
-            //Throw ICantOrdersException
+            logger.error("Mower orders failure");
+            //Throw ICantOrdersException ?
         }
     }
 }

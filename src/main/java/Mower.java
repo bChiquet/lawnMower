@@ -55,7 +55,7 @@ public class Mower {
         //If the mower moves forward, return move vector.
         switch (order) {
             case MOVE:
-                moveIfApplicable(order, isMovementLegal);
+                moveIfApplicable(isMovementLegal);
                 break;
             //If pivot, we pivot direction and return no move.
             case TURN_RIGHT:
@@ -67,7 +67,7 @@ public class Mower {
     }
 
     //applies an order move if it is not illegal.
-    private void moveIfApplicable(Order order, Predicate<Position> isMovementLegal) {
+    private void moveIfApplicable(Predicate<Position> isMovementLegal) {
         Position move = pos;
         switch (direction) {
             case NORTH:
