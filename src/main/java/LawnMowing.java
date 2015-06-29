@@ -63,8 +63,7 @@ public class LawnMowing {
         //Check if the mower collides with another mower
         return mowers.stream()
                 .map(mower -> !(mower.pos.equals(testedPos)))
-                .reduce((m1, m2) -> m1 & m2)
-                .get();
+                .reduce(true, (m1, m2) -> m1 & m2);
     }
 
     //Processing of file lines

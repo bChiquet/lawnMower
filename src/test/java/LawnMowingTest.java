@@ -30,7 +30,8 @@ public class LawnMowingTest {
 
     @Test
     public void should_not_create_stacked_mowers() {
-        //TODO add control to avoid two stacked mowers at file creation
+        lawnMowing.on(Resources.getResource("stackedMowerCheck").getPath());
+        assertThat(lawnMowing.mowers, hasSize(1));
     }
 
 
