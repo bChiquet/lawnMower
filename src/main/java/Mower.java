@@ -1,15 +1,13 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
+import java.util.function.Predicate;
 
 /**
  * Mower object
  */
 public class Mower {
     //Mower coordinates & direction faced
-    Integer posX;
-    Integer posY;
+    Position pos;
     Direction direction;
     //Orders to be executed by the mower
     private List<Order> orders = new ArrayList<>();
@@ -22,8 +20,7 @@ public class Mower {
      * @return self - harmcrest style.
      */
     public Mower setPosition(Integer posX, Integer posY, Direction direction){
-        this.posX = posX;
-        this.posY = posY;
+        this.pos = new Position(posX, posY);
         this.direction = direction;
         return this;
     }
@@ -34,9 +31,8 @@ public class Mower {
      * @return self - harmcrest style.
      */
     public Mower setOrders(String orders) {
-
         orders.chars()
-                .mapToObj(c -> (char)c)
+                .mapToObj(c -> (char) c)
                 .map(Object::toString)
                 .map(Order::fromString)
                 .forEachOrdered(this.orders::add);
@@ -46,44 +42,20 @@ public class Mower {
     /**
      * Processes the mower's order list
      * @param isMovementLegal A method to check if a movement is legal.
+     * @return self - harmcrest style.
      */
-    public void processAllOrders(BiFunction<Integer, Integer, Boolean> isMovementLegal) {
+    public Mower processAllOrders(Predicate<Position> isMovementLegal) {
         orders.stream()
-                .map(this::ordersToMovements)
-                .filter(this::doesMove) //Filtering out the stationary movements.
-                .forEachOrdered(movement -> {
-                    if (isMovementLegal.apply(
-                            posX + movement.get(Directions.MAP_X),
-                            posY + movement.get(Directions.MAP_Y))) {
-                        setPosition(posX + movement.get(Directions.MAP_X),
-                                    posY + movement.get(Directions.MAP_Y),
-                                    direction);
-                    }
-                });
+                .forEachOrdered(order -> executeOrder(order, isMovementLegal));
+        return this;
     }
 
-    //Returns true if a movement vector is not NoMove.
-    private boolean doesMove(List<Integer> movement) {
-        return ! movement.stream()
-                .reduce((a, b) -> a+b)
-                .get().equals(0);
-    }
-
-    //Translates the movements from the order list into a list of coordinate changes.
-    private List<Integer> ordersToMovements(Order order) {
+    //Executes an order given if it is legal.
+    private void executeOrder(Order order, Predicate <Position> isMovementLegal) {
         //If the mower moves forward, return move vector.
         switch (order) {
             case MOVE:
-                switch (direction) {
-                    case NORTH:
-                        return Directions.moveNorth;
-                    case SOUTH:
-                        return Directions.moveSouth;
-                    case EAST:
-                        return Directions.moveEast;
-                    case WEST:
-                        return Directions.moveWest;
-                }
+                moveIfApplicable(order, isMovementLegal);
                 break;
             //If pivot, we pivot direction and return no move.
             case TURN_RIGHT:
@@ -91,9 +63,26 @@ public class Mower {
                 break;
             case TURN_LEFT:
                 pivotLeft();
-                break;
         }
-        return Directions.noMove;
+    }
+
+    //applies an order move if it is not illegal.
+    private void moveIfApplicable(Order order, Predicate<Position> isMovementLegal) {
+        Position move = pos;
+        switch (direction) {
+            case NORTH:
+                move = new Position(pos).moveNorth();
+                break;
+            case SOUTH:
+                move = new Position(pos).moveSouth();
+                break;
+            case EAST:
+                move = new Position(pos).moveEast();
+                break;
+            case WEST:
+                move = new Position(pos).moveWest();
+        }
+        if (isMovementLegal.test(move)) pos = move;
     }
 
     //steering methods
@@ -113,7 +102,6 @@ public class Mower {
         }
         return null;
     }
-
     private Direction pivotRight() {
         switch(direction){
             case NORTH:

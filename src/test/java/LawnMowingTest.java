@@ -39,11 +39,9 @@ public class LawnMowingTest {
         lawnMowing.on(Resources.getResource("basicMowing").getPath())
                 .processMowersOrders();
 
-        assertEquals(new Integer(1), lawnMowing.mowers.get(0).posX);
-        assertEquals(new Integer(3), lawnMowing.mowers.get(0).posY);
+        assertEquals(new Position(1, 3), lawnMowing.mowers.get(0).pos);
         assertEquals(Direction.NORTH, lawnMowing.mowers.get(0).direction);
-        assertEquals(new Integer(5), lawnMowing.mowers.get(1).posX);
-        assertEquals(new Integer(1), lawnMowing.mowers.get(1).posY);
+        assertEquals(new Position(5, 1), lawnMowing.mowers.get(1).pos);
         assertEquals(Direction.EAST, lawnMowing.mowers.get(1).direction);
     }
 
@@ -52,8 +50,7 @@ public class LawnMowingTest {
         lawnMowing.on(Resources.getResource("borderCheck").getPath())
                 .processMowersOrders();
 
-        assertEquals(new Integer(0), lawnMowing.mowers.get(0).posX);
-        assertEquals(new Integer(0), lawnMowing.mowers.get(0).posY);
+        assertEquals(new Position(0, 0), lawnMowing.mowers.get(0).pos);
     }
 
     @Test
@@ -61,7 +58,6 @@ public class LawnMowingTest {
         lawnMowing.on(Resources.getResource("collisionCheck").getPath())
                 .processMowersOrders();
 
-        assertEquals(new Integer(1), lawnMowing.mowers.get(1).posX);
-        assertEquals(new Integer(2), lawnMowing.mowers.get(1).posY);
+        assertEquals(new Position(1, 2), lawnMowing.mowers.get(1).pos);
     }
 }

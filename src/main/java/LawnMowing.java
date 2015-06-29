@@ -8,6 +8,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class LawnMowing {
+    //File mapping
+    static int MAP_X = 0;
+    static int MAP_Y = 1;
+    static int MAP_DIRECTION = 2;
+
     //Lawn dimensions
     Integer lawnSizeX;
     Integer lawnSizeY;
@@ -44,19 +49,18 @@ public class LawnMowing {
 
     /**
      * function to check if a mower can be at coordinates
-     * @param finalPosX the potential x-coordinate of the mower
-     * @param finalPosY the potential y-coordinate of the mower
+     * @param testedPos the position considered
      * @return 0 if the position is legal, a positive number otherwise
      */
-    public boolean isPositionLegal(Integer finalPosX, Integer finalPosY) {
+    public boolean isPositionLegal(Position testedPos) {
         //Check if the final pos is in the field
-        if ( finalPosX < 0 || finalPosX > lawnSizeX ||
-                finalPosY < 0 || finalPosY > lawnSizeY) {
+        if ( testedPos.x < 0 || testedPos.x > lawnSizeX ||
+                testedPos.y < 0 || testedPos.y > lawnSizeY) {
             return false;
         }
         //Check if the mower collides with another mower
         return mowers.stream()
-                .map(mower -> !(mower.posX.equals(finalPosX) && mower.posY.equals(finalPosY)))
+                .map(mower -> !(mower.pos.equals(testedPos)))
                 .reduce((m1, m2) -> m1 & m2)
                 .get();
     }
@@ -82,8 +86,8 @@ public class LawnMowing {
         String[] lawnDimensions;
         if (lawnSizeLine.matches("^(\\d) (\\d)$")){
             lawnDimensions = lawnSizeLine.split("\\s+");
-            lawnSizeX = Integer.valueOf(lawnDimensions[Directions.MAP_X]);
-            lawnSizeY = Integer.valueOf(lawnDimensions[Directions.MAP_Y]);
+            lawnSizeX = Integer.valueOf(lawnDimensions[MAP_X]);
+            lawnSizeY = Integer.valueOf(lawnDimensions[MAP_Y]);
         }
         else {
             //TODO use proper logger
@@ -97,9 +101,9 @@ public class LawnMowing {
         if (mowerLocation.matches("^\\d \\d [NSEW]$")) {
             String[] coords = mowerLocation.split("\\s+");
             halfBuiltMower = new Mower().setPosition(
-                    Integer.valueOf(coords[Directions.MAP_X]),
-                    Integer.valueOf(coords[Directions.MAP_Y]),
-                    Direction.fromString(coords[Directions.MAP_DIRECTION])
+                    Integer.valueOf(coords[MAP_X]),
+                    Integer.valueOf(coords[MAP_Y]),
+                    Direction.fromString(coords[MAP_DIRECTION])
             );
         }
         else {
