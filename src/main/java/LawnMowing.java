@@ -118,7 +118,12 @@ public class LawnMowing {
     //Processes mower orders file line
     private void completeMowerAssembly(String mowerOrders) {
         if (mowerOrders.matches("^[ADG]+$")){
-            mowers.add(halfBuiltMower.setOrdersFromString(mowerOrders));
+            if (isPositionLegal(halfBuiltMower.pos)) {
+                mowers.add(halfBuiltMower.setOrdersFromString(mowerOrders));
+            }
+            else {
+                //TODO Figure what to do with the failing mower.
+            }
             halfBuiltMower = null;
         }
         else {
